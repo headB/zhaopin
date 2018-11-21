@@ -12,13 +12,22 @@ class SpiderZhilianItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     pass
-    #具体的城市
+    #1.具体的城市
     city = scrapy.Field()
-    #职位名称
+    #2.职位名称
     job_name = scrapy.Field()
     #职位描述
-    job_descirption = scrapy.Field()
-    #职位薪资
-    job_salary = scrapy.Field()
+    #job_descirption = scrapy.Field()
+    #3.职位薪资
+    salary = scrapy.Field()
+    #4.学历要求
+    education = scrapy.Field()
+    #5.经验
+    experience = scrapy.Field()
+    #6.公司名字
+    company_name = scrapy.Field()
+    
+
+
 
 
