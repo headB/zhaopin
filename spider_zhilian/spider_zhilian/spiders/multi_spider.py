@@ -5,6 +5,7 @@ from multiprocessing import Pool
 import json
 from datetime import datetime
 import os
+import redis
 
 #定义好连接的redis主机
 redis_info = {}
@@ -36,13 +37,13 @@ def decode_2_json(response_content):
 
 
 
-def crawler_zhilian():
+def crawler_zhilian(city_code):
 
     #处理页数问题
     #随机获得一个
     
     #城市代码
-    city_code = '763'
+    # city_code = '763'
     #每页获取得到的结果
     page_size = '100'
 
@@ -65,7 +66,7 @@ def crawler_zhilian():
 
     # mutil_pool = Pool(4)
 
-    #设置当前城市的code到redis,类型为列表
+    
 
     for x in range(1,5):
 
@@ -73,7 +74,7 @@ def crawler_zhilian():
         url = request_url+"%s&start=%s&pageSize=%s"%(city_code,int(page_size)*(x-1),page_size)
         print(url)
 
-        conn_redis.set()
+        conn_redis.rpush("request_"+city_code,url)
         #然后生成的链接,插入到redis,等待被其他分布式的爬虫爬取资料.
         #想想不是啦,还是以省份为界限.
 
@@ -165,5 +166,6 @@ def set_cityinfo_2_redis():
 if __name__ == "__main__":
 
     show_time()
-    crawler_zhilian()
+    # crawler_zhilian("763")
+    crawler_zhilian("538")
     show_time()
