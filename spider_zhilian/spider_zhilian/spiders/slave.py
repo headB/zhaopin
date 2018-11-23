@@ -2,6 +2,7 @@
 import requests
 from lxml import etree
 import redis
+from multiprocessing import Pool
 
 #连接redis数据库
 
@@ -17,17 +18,29 @@ conn_redis = redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],p
 #尝试去redis中获取需要等待请求的url地址,并且,处理完一个就drop一个记录
 #所以这里用到的方法自然就是pop
 
+#因为多进程的时候,对方必须是函数,也不能是实例,所以,我这里,就封装一下那个爬取的函数啦.!
+def request_2_redis(city_code,request_url):
+
+    try:
+        res = requests.get(request_url).content.decode()
+        conn_redis.rpush("res_"+str(city_code),res)
+    except Exception as e:
+        return False
+    
+    return True
+
 
 def search_and_request():
     #首先去尝试循环列出请求
     all_keys = conn_redis.keys()
-    for x in all_keys:
-        print(type(x))
-    request_key = [str(x.decode()) for x in all_keys if str(x.decode()).startswith('request') ]
+    request_key = [str(x.decode()) for x in all_keys if str(x.decode()).startswith('request')]
     #得到所有请求的关键key了
     #然后利用lpop
     
     #并且需要获取列表的长度
+
+    #然后这里需要用到多进程技术,然后这里采用的就是进程池了,因为,简单,也是比较实用,而且处理速度的确都是快
+    pool = Pool(4)
     for x in request_key:
         #因为是可能是并发执行请求,所以得上except机制,
         try:
@@ -37,8 +50,7 @@ def search_and_request():
             while request_url:
 
                 #然后就去请求,并且又保存到数据库当中.也是,以城市code为键值
-                print(request_url)
-
+                pool.apply_async(request_2_redis,args=(x,request_url))
                 request_url = conn_redis.lpop(x).decode()
 
             #获取每一个key的长度
@@ -50,8 +62,12 @@ def search_and_request():
             #     pass
             #     conn_redis.
         except Exception as e:
+
             print(e)
             #然后继续下一个,不要停下来
-
+        
+        print(str(x)+" is OK ! ")
+    pool.close()
+    pool.join()
 
 search_and_request()

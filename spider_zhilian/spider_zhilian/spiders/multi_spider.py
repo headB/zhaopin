@@ -36,7 +36,7 @@ def decode_2_json(response_content):
 
 
 
-
+#得到city_code,然后模拟请求,插入到redis中
 def crawler_zhilian(city_code):
 
     #处理页数问题
@@ -68,18 +68,17 @@ def crawler_zhilian(city_code):
 
     
 
-    for x in range(1,5):
+    for x in range(1,total_page):
 
         file_name = "zhilian_zhaopin_"+str(x)+'.json'
         url = request_url+"%s&start=%s&pageSize=%s"%(city_code,int(page_size)*(x-1),page_size)
-        print(url)
 
         conn_redis.rpush("request_"+city_code,url)
         #然后生成的链接,插入到redis,等待被其他分布式的爬虫爬取资料.
         #想想不是啦,还是以省份为界限.
 
         # mutil_pool.apply_async(decode_and_save_file,args=(url,file_name))
-    
+    print(city_code+" is OK")
     # mutil_pool.close()
     # mutil_pool.join()
         
@@ -95,7 +94,7 @@ def decode_and_save_file(url,file_name):
 
 #返回所有省份对应的id信息
 
-#返回列表,其中,x['hot_city']为热门城市,x['province']为除了4个直辖市的所有中国省份信息
+#返回列表,其中,x['hot_citys']为热门城市,x['province']为除了4个直辖市的所有中国省份信息
 def return_province_info():
 
     
@@ -123,9 +122,9 @@ def return_province_info():
     city_info = city_info_json['basic']['dict']['location']['province']
     hot_city_info = city_info_json['basic']['dict']['location']['hotcitys']
 
-    city_list = []
-    city_list['hot_city'] = hot_city_info
-    city_info['province'] = city_info
+    city_list = {}
+    city_list['hot_citys'] = hot_city_info[1:]
+    city_list['province'] = city_info
 
     return city_list
 
@@ -160,12 +159,16 @@ def create_dir(province_cde):
 
 def set_cityinfo_2_redis():
     pass
-    #获取热门城市的信息
+    #获取热门城市的信息'
+
+def save_provinceinfo_2_mysql():
+    pass
 
 
 if __name__ == "__main__":
 
     show_time()
-    # crawler_zhilian("763")
-    crawler_zhilian("538")
+    #获取热门城市的city_code
+    for x in return_province_info()['hot_citys']:
+        crawler_zhilian(str(x['code']))
     show_time()
