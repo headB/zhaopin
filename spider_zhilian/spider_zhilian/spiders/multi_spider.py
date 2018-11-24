@@ -67,18 +67,21 @@ def crawler_zhilian(city_code):
     # mutil_pool = Pool(4)
 
     
-
+    urls = []
     for x in range(1,total_page):
 
-        file_name = "zhilian_zhaopin_"+str(x)+'.json'
-        url = request_url+"%s&start=%s&pageSize=%s"%(city_code,int(page_size)*(x-1),page_size)
+        # file_name = "zhilian_zhaopin_"+str(x)+'.json'
 
-        conn_redis.rpush("request_"+city_code,url)
+        url = request_url+"%s&start=%s&pageSize=%s"%(city_code,int(page_size)*(x-1),page_size)
+        urls.append(url)
+
+    
         #然后生成的链接,插入到redis,等待被其他分布式的爬虫爬取资料.
         #想想不是啦,还是以省份为界限.
 
         # mutil_pool.apply_async(decode_and_save_file,args=(url,file_name))
     print(city_code+" is OK")
+    yield urls
     # mutil_pool.close()
     # mutil_pool.join()
         
@@ -170,5 +173,7 @@ if __name__ == "__main__":
     show_time()
     #获取热门城市的city_code
     for x in return_province_info()['hot_citys']:
-        crawler_zhilian(str(x['code']))
+        for x1 in crawler_zhilian(str(x['code'])):
+        #然后获取到的批量url保存都redis数据库
+            conn_redis.rpush("request_"+str(x['code']),x1)
     show_time()
