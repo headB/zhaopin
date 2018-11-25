@@ -14,12 +14,29 @@ BOT_NAME = 'spider_zhilian'
 SPIDER_MODULES = ['spider_zhilian.spiders']
 NEWSPIDER_MODULE = 'spider_zhilian.spiders'
 
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+
+# Ensure all spiders share same duplicates filter through redis.
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+ITEM_PIPELINES = {
+    'scrapy_redis.pipelines.RedisPipeline': 300
+}
+
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'spider_zhilian (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
+
+REDIS_URL = 'redis://localhost:6379'
+
+REDIS_HOST = 'localhost'
+REDIS_PASSWD = ''
+REDIS_PORT = 6379
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

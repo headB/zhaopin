@@ -13,6 +13,10 @@ import json
 
 #导入自己写的省份信息输出
 from .multi_spider import crawler_zhilian,return_province_info
+from .slave import manu_conn_redis1
+
+#导入redis的分布式爬虫类
+from scrapy_redis.spiders import RedisSpider
 
 #就是,爬虫教程,有提及的,就是,最基本的爬虫,包括了
 #item
@@ -21,18 +25,29 @@ from .multi_spider import crawler_zhilian,return_province_info
 #parse(这个是后续的处理吧)
 
 
-class zhiLianSpider(CrawlSpider):
+class zhiLianSpider(RedisSpider):
     name = "zhilian_1"
-    allowed_domains = ['zhaopin.com']
-    start_urls = [
-        'https://sou.zhaopin.com/?jl=489',
-    ]
+
+    def __init__(self):
+        self.allowed_domains = ['zhaopin.com']
+        start_urls = [
+            'https://sou.zhaopin.com/?jl=489',
+        ]
     
     rules = (
         Rule(LinkExtractor(allow=(r"https://fe-api.zhaopin.com/c/i/sou/\?cityId")),callback='handle_json_2_item',follow=True),
         Rule(LinkExtractor(allow=(r"https://sou.zhaopin.com/\?jl=489$")),callback='create_2_request',follow=True),
         
     )
+
+    #redisSpider说,一定需要定义好parse函数,那没办法了,那就定义吧.
+    def parse(self,response):
+        pass
+        for x in self.create_2_request(response):
+
+            pass
+        
+
 
 
 #由于智联招聘现在的前端已经换了模式,所以需要采用特殊模式,直接当作是客户端处理
@@ -44,11 +59,15 @@ class zhiLianSpider(CrawlSpider):
         response_dict = json.loads(response.text)
         items = SpiderZhilianItem()
         for x in response_dict['data']['results']:
-            items['city_name'] =  x['city']
-            items['city'] = x['city']['items'][0]
+            items['city_name'] =  x['city']['display']
+            items['city'] = x['city']['items'][0]['code']
             items['company_name'] = x['company']['name']
             items['number'] = x['company']['number']
-            items['number'] = x['number']
+            
+            items['education'] = x['eduLevel']['name']
+            items['experience'] = x['workingExp']['name']
+            items['salary'] = x['salary']
+            items['job_name'] = x['jobName']
             yield items
 
     #创建批量的请求,
@@ -61,40 +80,13 @@ class zhiLianSpider(CrawlSpider):
         
         #制作大量url地址,又重新提交给scrapy
         #然后就是code和url配合
+        redis_conn = manu_conn_redis1
         for x in hot_city:
             for x1 in crawler_zhilian(x['code']):
                 for x2 in x1:
-                    yield scrapy.Request(x2,callback=self.handle_json_2_item)
+                    print(x2)
+                    # yield redis_conn.lpush("zhilian_1:start_urls",x2)
+                    # yield scrapy.Request(x2,callback=self.handle_json_2_item)
 
 
-
-
-
-    def process_job_info(self,response):
-        # pass
-        #尝试每一个结果,提取里面的关键字,例如是,职位,公司名称,薪资.
-        # print(request_url_organize())
-        items = SpiderZhilianItem()
-        items['job_name'] = response.xpath(r"//div//span[@class='contentpile__content__wrapper__item__info__box__jobname__title']//text()").extract_first()
-        items['salary'] = response.xpath(r"//div//p[@class='contentpile__content__wrapper__item__info__box__job__saray']//text()").extract_first()
-        items['company_name'] = response.xpath(r"//div//a[@class='contentpile__content__wrapper__item__info__box__cname__title company_title']//text()").extract_first()
-        items['city'] = response.xpath("//div//ul[@class='contentpile__content__wrapper__item__info__box__job__demand']/li[1]//text()").extract_first()
-        items['experience'] = response.xpath("//div//ul[@class='contentpile__content__wrapper__item__info__box__job__demand']/li[2]//text()").extract_first()
-        items['education'] = response.xpath("//div//ul[@class='contentpile__content__wrapper__item__info__box__job__demand']/li[3]//text()").extract_first()
-        
-        yield items
-
-
-    # def parse(self,response):
-
-    #     pass
-    #     print("捉到我一次!")
-    #     print(response)
-
-    #     title = response.xpath("//title/text()").extract()
-    #     title1 = response.xpath("//title/text()").extract_first()
-    #     print(title)
-    #     print(title1)
-
-    #     #然后就可以写规则了.
         

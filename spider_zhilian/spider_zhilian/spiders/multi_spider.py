@@ -175,5 +175,6 @@ if __name__ == "__main__":
     for x in return_province_info()['hot_citys']:
         for x1 in crawler_zhilian(str(x['code'])):
         #然后获取到的批量url保存都redis数据库
-            conn_redis.rpush("request_"+str(x['code']),x1)
+            for x2 in x1:
+                conn_redis.rpush("request_"+str(x['code']),x2)
     show_time()
