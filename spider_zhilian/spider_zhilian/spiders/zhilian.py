@@ -36,11 +36,11 @@ class zhiLianSpider(RedisSpider):
         #     pass
         
     
-    rules = (
-        Rule(LinkExtractor(allow=(r"https://fe-api.zhaopin.com/c/i/sou/\?cityId")),callback='handle_json_2_item',follow=True),
-        Rule(LinkExtractor(allow=(r"https://sou.zhaopin.com/\?jl=489$")),callback='create_2_request',follow=True),
+    # rules = (
+    #     Rule(LinkExtractor(allow=(r"https://fe-api.zhaopin.com/c/i/sou/\?cityId")),callback='handle_json_2_item',follow=True),
+    #     Rule(LinkExtractor(allow=(r"https://sou.zhaopin.com/\?jl=489$")),callback='create_2_request',follow=True),
         
-    )
+    # )
 
     #redisSpider说,一定需要定义好parse函数,那没办法了,那就定义吧.
     def parse(self,response):

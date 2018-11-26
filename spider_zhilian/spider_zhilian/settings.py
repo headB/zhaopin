@@ -20,7 +20,8 @@ SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
 ITEM_PIPELINES = {
-    'scrapy_redis.pipelines.RedisPipeline': 300
+    'scrapy_redis.pipelines.RedisPipeline': 300,
+    'spider_zhilian.pipelines.SpiderZhilianPipeline': 300
 }
 
 
