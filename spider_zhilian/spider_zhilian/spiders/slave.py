@@ -3,27 +3,30 @@ import requests
 from lxml import etree
 import redis
 from multiprocessing import Pool
+from .multi_spider import conn_redis
 
 #连接redis数据库
 
 #定义一个用户连接数据库的函数
 
 #定义好连接的redis主机
-redis_info = {}
-redis_info['host'] = '127.0.0.1'
-redis_info['port'] = 6379
-redis_info['password'] = ''
+# redis_info = {}
+# redis_info['host'] = '127.0.0.1'
+# redis_info['port'] = 6379
+# redis_info['password'] = ''
 
 #设置一个全局变量,用于设置lpop方式获取和取消该数值
 start_urls_exist = True
 
-def manu_conn_redis(redis_info):
-    return redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],password=redis_info['password'])
+# def manu_conn_redis(redis_info):
+#     return redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],password=redis_info['password'])
 
-manu_conn_redis1 = manu_conn_redis(redis_info)
+# manu_conn_redis1 = manu_conn_redis(redis_info)
+manu_conn_redis1 = conn_redis
+
 
 #返回一个redis连接类
-conn_redis = redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],password=redis_info['password'])
+# conn_redis = redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],password=redis_info['password'])
 
 #尝试去redis中获取需要等待请求的url地址,并且,处理完一个就drop一个记录
 #所以这里用到的方法自然就是pop
