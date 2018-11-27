@@ -18,12 +18,6 @@ from .slave import manu_conn_redis1
 #导入redis的分布式爬虫类
 from scrapy_redis.spiders import RedisSpider,RedisCrawlSpider
 
-#就是,爬虫教程,有提及的,就是,最基本的爬虫,包括了
-#item
-#name
-#start_urls
-#parse(这个是后续的处理吧)
-
 
 class zhiLianSpider(RedisCrawlSpider):
     name = "zhilian_1"
@@ -37,7 +31,7 @@ class zhiLianSpider(RedisCrawlSpider):
         # for x in self.create_2_request("123"):
         #     pass
     
-    manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
+    # manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
 
 
     rules = (
