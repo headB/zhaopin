@@ -16,7 +16,7 @@ from .multi_spider import crawler_zhilian,return_province_info
 from .slave import manu_conn_redis1
 
 #导入redis的分布式爬虫类
-from scrapy_redis.spiders import RedisSpider
+from scrapy_redis.spiders import RedisSpider,RedisCrawlSpider
 
 #就是,爬虫教程,有提及的,就是,最基本的爬虫,包括了
 #item
@@ -25,26 +25,33 @@ from scrapy_redis.spiders import RedisSpider
 #parse(这个是后续的处理吧)
 
 
-class zhiLianSpider(RedisSpider):
+class zhiLianSpider(RedisCrawlSpider):
     name = "zhilian_1"
-    start_urls = ''
+    start_urls = 'https://sou.zhaopin.com/?jl=489'
 
-    def __init__(self):
+    def __init__(self,*args,**kwargs):
         self.allowed_domains = ['zhaopin.com']
         self.start_urls = 'https://sou.zhaopin.com/?jl=489'
+        super().__init__(*args,**kwargs)
+    
         # for x in self.create_2_request("123"):
         #     pass
-        
     
-    # rules = (
-    #     Rule(LinkExtractor(allow=(r"https://fe-api.zhaopin.com/c/i/sou/\?cityId")),callback='handle_json_2_item',follow=True),
-    #     Rule(LinkExtractor(allow=(r"https://sou.zhaopin.com/\?jl=489$")),callback='create_2_request',follow=True),
+    manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
+
+
+    rules = (
+        Rule(LinkExtractor(allow=(r"zhaopin.com")),callback='test_rule_is_have_use',follow=True),
+        Rule(LinkExtractor(allow=(r"https://fe-api\.zhaopin\.com/c/i/sou/\?cityId")),callback='parse_item',follow=True),
         
-    # )
+    )
+    
+
+    def test_rule_is_have_use(self,response):
+        print("use my now!")
 
     #redisSpider说,一定需要定义好parse函数,那没办法了,那就定义吧.
-    def parse(self,response):
-        
+    def parse_item(self,response):
         yield self.handle_json_2_item(response)
         
 
