@@ -30,7 +30,7 @@ ITEM_PIPELINES = {
 #USER_AGENT = 'spider_zhilian (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 REDIS_URL = 'redis://localhost:6379'
 

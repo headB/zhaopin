@@ -24,22 +24,21 @@ class zhiLianSpider(RedisCrawlSpider):
     start_urls = 'https://sou.zhaopin.com/?jl=489'
 
     def __init__(self,*args,**kwargs):
-        self.allowed_domains = ['zhaopin.com']
+        self.allowed_domains = ['zhaopin.com','baidu.com']
         self.start_urls = 'https://sou.zhaopin.com/?jl=489'
         super().__init__(*args,**kwargs)
     
-        for x in self.create_2_request("123"):
-            pass
+    #     for x in self.create_2_request("123"):
+    #         pass
     
     manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
 
 
     rules = (
-        Rule(LinkExtractor(allow=(r"zhaopin\.com/\?jl")),callback='test_rule_is_have_use',follow=True),
+        Rule(LinkExtractor(allow=(r"zhaopin\.com/\?jl")),callback='process_item_c1',follow=True),
         Rule(LinkExtractor(allow=(r"https://fe-api\.zhaopin\.com/c/i/sou/\?cityId.+")),callback='process_item_c1',follow=True),
         
-    )
-    
+    )  
 
     def test_rule_is_have_use(self,response):
         manu_conn_redis1.lpush("test_content",response.text)
@@ -49,11 +48,11 @@ class zhiLianSpider(RedisCrawlSpider):
         print("I am the kumanxuan")
         # print(response.url)
         self.handle_json_2_item(response)
+        
     
     # def parse(self,response):
 
-    #     yield self.handle_json_2_item(response)
-
+    #     yield scrapy.Request("https://www.baidu.com")
 
 
 #由于智联招聘现在的前端已经换了模式,所以需要采用特殊模式,直接当作是客户端处理

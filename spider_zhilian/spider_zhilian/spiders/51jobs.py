@@ -11,7 +11,10 @@ class w51jobCrawler(RedisCrawlSpider):
     name = '51job'
     
     rules = (
-        Rule(LinkExtractor(allow=(r'51job\.com')),callback='parse_items',follow=True),
+        #这个规则是捉取10个热门城市的首页信息
+        Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//a")),callback='parse_items',follow=False),
+        # Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//@href")),callback='parse_items',follow=False),
+        # Rule(LinkExtractor(allow=(r"51job\.com")),callback='parse_items',follow=False),
     )
 
     def __init__(self,*args,**kwargs):
@@ -20,11 +23,17 @@ class w51jobCrawler(RedisCrawlSpider):
         super().__init__(*args,**kwargs)
 
     
+    def get_hot_city_info(self,response):
+        pass
+        print("xxcc")
+        # print(dir(response))
 
 
     def parse_items(self,response):
         print("kumanxuan")
         pass
 
+    # def 
+    
     
 
