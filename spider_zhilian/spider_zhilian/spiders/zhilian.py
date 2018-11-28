@@ -28,26 +28,31 @@ class zhiLianSpider(RedisCrawlSpider):
         self.start_urls = 'https://sou.zhaopin.com/?jl=489'
         super().__init__(*args,**kwargs)
     
-        # for x in self.create_2_request("123"):
-        #     pass
+        for x in self.create_2_request("123"):
+            pass
     
-    # manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
+    manu_conn_redis1.lpush("zhilian_1:start_urls",start_urls)
 
 
     rules = (
-        Rule(LinkExtractor(allow=(r"zhaopin.com")),callback='test_rule_is_have_use',follow=True),
-        Rule(LinkExtractor(allow=(r"https://fe-api\.zhaopin\.com/c/i/sou/\?cityId")),callback='parse_item',follow=True),
+        Rule(LinkExtractor(allow=(r"zhaopin\.com/\?jl")),callback='test_rule_is_have_use',follow=True),
+        Rule(LinkExtractor(allow=(r"https://fe-api\.zhaopin\.com/c/i/sou/\?cityId.+")),callback='process_item_c1',follow=True),
         
     )
     
 
     def test_rule_is_have_use(self,response):
-        print("use my now!")
+        manu_conn_redis1.lpush("test_content",response.text)
 
     #redisSpider说,一定需要定义好parse函数,那没办法了,那就定义吧.
-    def parse_item(self,response):
-        yield self.handle_json_2_item(response)
-        
+    def process_item_c1(self,response):
+        print("I am the kumanxuan")
+        # print(response.url)
+        self.handle_json_2_item(response)
+    
+    # def parse(self,response):
+
+    #     yield self.handle_json_2_item(response)
 
 
 
@@ -58,8 +63,9 @@ class zhiLianSpider(RedisCrawlSpider):
         #response里面有text方法的,不过大多数情况是使用xpath这个方法的,因为这个用途比较广泛
         pass
         response_dict = json.loads(response.text)
-        items = SpiderZhilianItem()
+        # items = SpiderZhilianItem()
         for x in response_dict['data']['results']:
+            items = {}
             items['city_name'] =  x['city']['display']
             items['city'] = x['city']['items'][0]['code']
             items['company_name'] = x['company']['name']
@@ -69,7 +75,12 @@ class zhiLianSpider(RedisCrawlSpider):
             items['experience'] = x['workingExp']['name']
             items['salary'] = x['salary']
             items['job_name'] = x['jobName']
-        return  items
+
+            #这里没完成一次,都把这些字典数据保存到redis数据库当中.!
+            manu_conn_redis1.lpush('res_'+str(items['city']),items)
+        
+            yield items
+        # return  items
 
     #创建批量的请求,
     #这里的话,还需要解析出具体的省份信息

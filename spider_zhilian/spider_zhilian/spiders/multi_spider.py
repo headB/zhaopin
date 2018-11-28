@@ -9,11 +9,11 @@ import redis
 
 #定义好连接的redis主机
 redis_info = {}
-redis_info['host'] = '192.168.113.11'
-# redis_info['host'] = 'localhost'
+# redis_info['host'] = '192.168.113.11'
+redis_info['host'] = 'localhost'
 redis_info['port'] = 6379
-redis_info['password'] = 'lizhixuan123'
-# redis_info['password'] = ''
+# redis_info['password'] = 'lizhixuan123'
+redis_info['password'] = ''
 
 #返回一个redis连接类
 conn_redis = redis.StrictRedis(host=redis_info['host'],port=redis_info['port'],password=redis_info['password'])
