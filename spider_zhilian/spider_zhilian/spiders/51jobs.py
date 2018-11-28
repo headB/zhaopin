@@ -12,7 +12,7 @@ class w51jobCrawler(RedisCrawlSpider):
     
     rules = (
         #这个规则是捉取10个热门城市的首页信息
-        Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//a")),callback='parse_items',follow=False),
+        Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//a")),callback='get_hot_city_info',follow=False),
         # Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//@href")),callback='parse_items',follow=False),
         # Rule(LinkExtractor(allow=(r"51job\.com")),callback='parse_items',follow=False),
     )
@@ -25,15 +25,19 @@ class w51jobCrawler(RedisCrawlSpider):
     
     def get_hot_city_info(self,response):
         pass
-        print("xxcc")
         # print(dir(response))
+        print(response.url)
+        #然后没解析出一个城市的url都lpush到redis数据库当中!
+        conn_redis.lpush("51job:start_urls",response.url)
+
+
 
 
     def parse_items(self,response):
         print("kumanxuan")
         pass
 
-    # def 
+
     
     
 
