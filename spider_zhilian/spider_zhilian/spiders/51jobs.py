@@ -6,6 +6,7 @@ import requests
 import re
 import json
 from lxml import etree
+from spider_zhilian.items import SpiderZhilianItem
 
 #https://search.51job.com/list/010000,000000,0000,00,9,99,%2520,2,1.html
 #格式是01000,第一串数字
@@ -16,6 +17,8 @@ def parse_url(city_code):
     return "https://search.51job.com/list/{},000000,0000,00,9,99,\%2520,2,1.html".format(city_code)
 
 
+
+
 conn_redis.lpush("51job:start_urls",parse_url("030200"))
 
 class w51jobCrawler(RedisCrawlSpider):
@@ -24,8 +27,9 @@ class w51jobCrawler(RedisCrawlSpider):
     start_urls = ""
     rules = (
         #这个规则是捉取10个热门城市的首页信息
-        Rule(LinkExtractor(restrict_xpaths=("//div[@class='hcct']//a")),callback='get_hot_city_info'),
-        # Rule(LinkExtractor(allow=(r"030200,000000,0000,00,9,99,%2520,2,1\.html$")),callback='get_hot_city_info'),
+        # Rule(LinkExtractor(restrict_xpaths=("//div[@class='ht']//a")),callback='test'),
+        #这里就可以开始捉取合资格的url地址了.
+        Rule(LinkExtractor(allow=("https://search\.51job\.com/list")),callback='parse_page'),
     )
 
     def __init__(self,*args,**kwargs):
@@ -37,8 +41,7 @@ class w51jobCrawler(RedisCrawlSpider):
 
     
     def get_hot_city_info(self):
-        pass
-        # print(dir(response))
+        
         city_code = self.parse_city_code()
         # print(response.url)
         del(city_code['广州'])
@@ -60,12 +63,15 @@ class w51jobCrawler(RedisCrawlSpider):
         #然后没解析出一个城市的url都lpush到redis数据库当中!
         # conn_redis.lpush("51job:start_urls",response.url)
 
+   
 
+    def parse_page(self,response):
 
+        print("checking")
 
-    def parse_items(self,response):
-        print("kumanxuan")
-        pass
+        for x in self.w51jobCommonItem(response):
+
+            yield x
 
 
     def parse_city_code(self):
@@ -83,7 +89,35 @@ class w51jobCrawler(RedisCrawlSpider):
 
         return dict1
 
-    
+    #这里可以处理
+    #处理每一个首页的职位信息
+    def parse_start_url(self,response):
+
+        for x in  self.w51jobCommonItem(response):
+            yield x
+
+
+    def w51jobCommonItem(self,response):
+
+        for x in response.xpath("//div[@class='dw_table']//div[@class='el']"):
+
+            items = SpiderZhilianItem()
+            try:
+
+                #还有城市代码
+                items['city'] = re.findall("list/(.+?),",response.url)[0]
+                #职位名称
+                items['job_name'] = x.xpath("p[@class='t1 ']/span/a/text()").extract()[0].strip("\r\n").strip()
+                #公司名
+                items['company_name'] = x.xpath("span[@class='t2']/a/text()").extract()[0].strip("\r\n").strip()
+                # #工作地点
+                items['city_name'] = x.xpath("span[@class='t3']/text()").extract()[0].strip("\r\n").strip()
+                # #薪资
+                items['salary'] = x.xpath("span[@class='t4']/text()").extract()[0].strip("\r\n").strip()
+            except Exception as e:
+                print(e)
+        
+            yield items
 
     
 
