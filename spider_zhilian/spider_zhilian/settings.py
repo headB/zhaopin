@@ -32,11 +32,14 @@ ITEM_PIPELINES = {
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
-REDIS_URL = 'redis://localhost:6379'
+# REDIS_URL = 'redis://localhost:6379'
 
-REDIS_HOST = 'localhost'
-REDIS_PASSWD = ''
-REDIS_PORT = 6379
+REDIS_URL = 'redis://root:lizhixuan123@192.168.113.11:6379'
+
+
+# REDIS_HOST = 'localhost'
+# REDIS_PASSWD = ''
+# REDIS_PORT = 6379
 
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
