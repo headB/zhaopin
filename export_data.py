@@ -12,7 +12,7 @@ def read_data_from_redis():
     
     #然后就是利用生成器,返回数据
     for x in keys_info:
-        if x.decode().startswith("res"):
+        if x.decode().startswith("51job:items"):
             try:
                 x = x.decode()
                 print(x)
@@ -27,6 +27,32 @@ def read_data_from_redis():
             except Exception as e:
                 print(e)
 
+
+def handle_json_data_51job_list(json_datas):
+    
+    pass
+    list_all = []
+    list_one = []
+    for x in json_datas:
+
+     #for x1 in x:
+        #print(x1,y)
+        list_all = []
+        list_one = []
+        list_one.append(x.get('job_name',''))
+        list_one.append(x.get('city_name',''))
+        list_one.append(x.get('company_name',''))
+        list_one.append(x.get('salary',''))
+        list_one.append(x.get('city',''))
+        #try:
+        #  list_one.append(x['salary'])
+        #except Exception as e:
+        #  print(e)
+          #list_one.append(" ")
+        #list_one.append(x['city'])
+        
+        list_all.append(list_one)
+        yield list_all
 
 def handle_json_data_zhilian_2_list(json_datas):
      
@@ -67,7 +93,7 @@ def handle_json_data_zhilian_2_list(json_datas):
 #然后可以写入数据
 def write_2_file(data):
 
-    with open('zhilian_zhaopin.csv','w',newline='') as file1:
+    with open('zhilian_51job.csv','a',newline='') as file1:
         try:
             writer = csv.writer(file1)
             for x in data:
@@ -82,8 +108,8 @@ def write_2_file(data):
 res = read_data_from_redis()
 
 #返回格式化后的生成器
-data = handle_json_data_zhilian_2_list(res)
-
+#data = handle_json_data_zhilian_2_list(res)
+data = handle_json_data_51job_list(res)
 print("I am kumanxuan!")
 
 #然后调用函数去写入数据了
