@@ -161,3 +161,16 @@ ava_salary_origin = ava_salary_origin.dropna()
 print(ava_salary_origin)
 
 #=========================================================================
+
+
+#=======================分组统计数据,然后得到平均薪资==========================
+#OK!开始处理
+
+#分组数据
+per_city_salary_data = ava_salary_origin.groupby("city_code")['salary'].mean().sort_values(ascending=False)
+per_city_salary_data.index = [ city_dict[str(x)] for x in per_city_salary_data.index]
+print(per_city_salary_data)
+
+#===============================================================================
+
+
