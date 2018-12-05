@@ -48,6 +48,25 @@ print(type(group_data))
 group_data.index = [city_dict[str(x)] for x in group_data.index ]
 group_data.sort_values(ascending=False)
 
+# group_data = data_test.groupby('city_code')['job_name'].count().sort_values()
+group_data = data_test.groupby('city_code').count()['job_name']
+group_data1 = data_test.groupby('city_code')['job_name'].count()
+# group_data = data_test.groupby('city_code').size()
+# group_data = data_test.groupby('city_code').count().sort_values(by='job_name',ascending=False)
+
+#group_data = data_test.groupby('city_code')
+
+# print(group_data.index)
+
+print(type(group_data))
+# print(group_data[530])
+# print(group_data.sort_values(ascending=False))
+# for x in group_data.index:
+#     print(x)
+group_data.index = [city_dict[str(x)] for x in group_data.index ]
+job_sort_number = group_data.sort_values(ascending=False)
+job_sort_number
+
 
 #添加对中文的支持
 #全局支持
@@ -69,4 +88,27 @@ plt.title('各城市职位需求图',fontproperties=font_setting)
 
 # plt.plot(range(1,55,2),[ x for x in job_sort_number.values ])
 # plt.xticks(range(1,30))
+plt.show()
+
+
+
+#先单独设置y轴的取值范围
+#其实感觉取了最大值,应该就差不多了吧.
+#先计算出总的需要填充y轴的总的列表吧.
+high_values = [x for x in job_sort_number.values]
+label_list = [x for x in job_sort_number.index]
+x_axis = range(0,len(label_list)*10,10)
+max_values = max(high_values) + 100000
+print(max_values)
+#设置范围,Y轴显示范围
+leng1 = plt.figure(figsize=(30,10),dpi=80)
+plt.ylim(0,max_values)
+#设置Y轴标题
+plt.ylabel("职位数量/个")
+#然后开始尝试填充条形图,每一个值的Y值,纵轴
+per_city = plt.bar(x_axis,high_values,width=9)
+for x in per_city:
+    plt.text(x.get_x(),x.get_height()+1,str(x.get_height()))
+#然后就尝试改变刻度了,让刻度显示索引
+plt.xticks(x_axis,label_list)
 plt.show()
