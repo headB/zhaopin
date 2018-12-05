@@ -117,3 +117,47 @@ for x in per_city:
 plt.xticks(x_axis,label_list)
 plt.title("中国大陆地区,智联招聘中27个热门城市的职位需求数量(11月)")
 plt.show()
+
+
+
+#=========================================================================
+#尝试去分析这个27个热门城市的所有职业的平均薪资
+
+
+#这里感觉就需要处理薪资的特殊数据了,要整理了.
+
+#ok,先分组,把jobname,salary,city_code拉出来
+
+
+ava_salary_origin = data_test.loc[:,['city_code','job_name','salary']]
+
+#尝试使用apply来应用特殊的数据处理了.
+def let_K_2_number(data):
+    
+    import re
+    import numpy as np
+    
+    salary_match = np.NAN
+    
+    try:
+        splits = data.split("-")
+        
+        salary_match = int(re.findall('(\d+)K',splits[-1])[0])
+        salary_match *= 1000
+        
+    except Exception as e:
+        print(splits)
+        print(e)
+        
+    return salary_match
+
+ava_salary_origin['salary'] = ava_salary_origin['salary'].apply(let_K_2_number)
+
+#判断是否存在空数据,错误数据
+# print(ava_salary_origin.isnull())
+#判断是否存在空数据,如果是,就抛弃整行数据
+ava_salary_origin = ava_salary_origin.dropna()
+
+print(ava_salary_origin)
+
+#=========================================================================
