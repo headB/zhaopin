@@ -95,20 +95,25 @@ plt.show()
 #先单独设置y轴的取值范围
 #其实感觉取了最大值,应该就差不多了吧.
 #先计算出总的需要填充y轴的总的列表吧.
+
+
 high_values = [x for x in job_sort_number.values]
 label_list = [x for x in job_sort_number.index]
 x_axis = range(0,len(label_list)*10,10)
-max_values = max(high_values) + 100000
-print(max_values)
+max_values = max(high_values) + 50000
 #设置范围,Y轴显示范围
-leng1 = plt.figure(figsize=(30,10),dpi=80)
-plt.ylim(0,max_values)
+leng1 = plt.figure(figsize=(30,14),dpi=80)
+plt.ylim(2000,max_values)
+# plt.yticks([x for x in range(0,max(high_values),50000)])
 #设置Y轴标题
 plt.ylabel("职位数量/个")
 #然后开始尝试填充条形图,每一个值的Y值,纵轴
 per_city = plt.bar(x_axis,high_values,width=9)
-for x in per_city:
-    plt.text(x.get_x(),x.get_height()+1,str(x.get_height()))
+# plt.grid()#开启横向和纵向网格
+plt.grid(axis='y')
 #然后就尝试改变刻度了,让刻度显示索引
+for x in per_city:
+    plt.text(x.get_x()+2,x.get_height()+10000,str(x.get_height()//10000)+"万")
 plt.xticks(x_axis,label_list)
+plt.title("中国大陆地区,智联招聘中27个热门城市的职位需求数量(11月)")
 plt.show()
