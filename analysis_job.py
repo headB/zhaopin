@@ -174,3 +174,49 @@ print(per_city_salary_data)
 #===============================================================================
 
 
+#===================统计平均薪资============================================================
+#然后利用matplotlib画图
+
+
+#条形图  bar图
+
+
+#首先设置图像的大小
+p1 = plt.figure(figsize=(20,10),dpi=80)
+
+
+
+
+
+#y轴范围
+#效果不怎么理想,切换手动刻度
+# plt.ylim(0,12000)
+plt.yticks([x for x in range(0,14000,1000)])
+
+
+#得出需要展示多少个结果先
+city_all_values = len(per_city_salary_data.index)
+
+#然后还得设置x轴的,画图的起始坐标,是每一个
+axis_list = range(city_all_values)
+
+#对的,然后下面X轴显示的字段,要设置了.
+
+axis_x_labels = [x for x in per_city_salary_data.index]
+#x轴字段
+#对x轴坐标相当敏感
+plt.xticks(axis_list,axis_x_labels)
+
+
+#y轴结果集
+axis_y_values = [x for x in per_city_salary_data.values]
+
+
+plt.title("智联招聘27个热门城市全部招聘岗位的平均薪资")
+plt.ylabel("人民币(元)")
+
+#然后就可以填充条形图了
+plt.bar(axis_list,axis_y_values)
+plt.grid(axis='y')
+
+plt.show()
