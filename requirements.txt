@@ -47,7 +47,7 @@ pyzmq==17.1.2
 queuelib==1.5.0
 redis==3.0.1
 requests==2.19.1
-Scrapy==1.5.1
+Scrapy==1.8.2
 scrapy-redis==0.6.8
 service-identity==17.0.0
 simplegeneric==0.8.1
